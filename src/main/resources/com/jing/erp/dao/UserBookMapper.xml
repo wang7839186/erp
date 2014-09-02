@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jing.erp.dao.UserBookMapper">
+	
+	<insert id="insertUB" parameterType="userBook">
+		insert into t_user_book
+			(book_id,user_name)
+		values
+			(#{bookID},#{username})
+	</insert>	
+	
+	<insert id="batchInsertUB" parameterType="java.util.List">
+		insert into t_user_book
+			(book_id,user_name)
+		values
+		<foreach collection="list" item="ub" separator=",">
+			(#{ub.bookID},#{ub.username})
+		</foreach>
+	</insert>	
+	
+	<delete id="deleteUB" parameterType="long">
+		delete from t_user_book where id = #{id}
+	</delete>
+	 
+</mapper>

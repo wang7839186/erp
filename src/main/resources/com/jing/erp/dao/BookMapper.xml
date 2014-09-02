@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jing.erp.dao.BookMapper">
+	
+	<resultMap id="bookResultMap" type="book">
+		<id property="id" column="id" />
+		<result property="bookName" column="book_name"/>
+		<result property="num" column="num"/>
+		<result property="price" column="price"/>
+		<result property="location" column="location"/>
+		<result property="version" column="version"/>
+		<association property="type" column="type_id" select="selectType" />
+	</resultMap>
+	
+	<sql id="baseSelectSql">select id,book_name,num,price,type_id,location,version from t_book</sql>
+	<sql id="baseDeleteSql">delete from t_book</sql>
+	<sql id="baseColumn">id,book_name,num,price,type_id,location</sql>
+	
+	<select id="findAll" resultMap="bookResultMap">
+		<include refid="baseSelectSql"/>
+	</select>
+	
+	<select id="selectType" parameterType="java.lang.String" resultType="bookType">
+		select id,name
+		from t_book_type
+		where id=#{bookID}
+	</select>
+	
+	<select id="findByID" parameterType="java.lang.String" resultMap="bookResultMap">
+		<include refid="baseSelectSql"/>
+		where id=#{id}
+	</select>
+	
+	<delete id="deleteByID" parameterType="java.lang.String">
+		<include refid="baseDeleteSql"/>
+		where id = #{id}
+	</delete>
+	 
+	 <delete id="deleteAll">
+	 	<include refid="baseDeleteSql"/>
+	 </delete>
+	 
+	 <update id="updateBook" parameterType="book">
+	 	update t_book
+	 	<set>
+	 		<if test="bookName != ''">
+	 			book_name = #{bookName},
+	 		</if>
+	 		<if test="num != 0">
+	 			num = #{num},
+	 		</if>
+	 		<if test="price != ''">
+	 			price = #{price},
+	 		</if>
+	 		<if test="type.id != 0">
+	 			type_id = #{type.id},
+	 		</if>
+	 		<if test="location != '' ">
+	 			location = #{location},
+	 		</if>
+	 		version = version +1
+	 	</set>
+	 	where id=#{id} and version = #{version}
+	 </update>
+	 
+	 <insert id="insertBook" parameterType="book">
+	 	insert into t_book
+	 		(<include refid="baseColumn"/>)
+	 	values
+	 		(#{id},#{bookName},#{num},#{price},#{type.id},#{location})
+	 </insert>
+	 
+	 <insert id="batchInsertBook" parameterType="java.util.List">
+	 	insert into t_book
+	 		(<include refid="baseColumn"/>)
+	 	values
+	 	<foreach collection="list" item="book" separator=",">
+	 		(#{book.id},#{book.bookName},#{book.num},#{book.price},#{book.type.id},#{book.location})
+	 	</foreach>
+	 </insert>
+</mapper>
